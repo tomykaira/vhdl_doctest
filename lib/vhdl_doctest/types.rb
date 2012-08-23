@@ -11,6 +11,7 @@ module VhdlDoctest
           return result
         end
       end
+      raise "Type for #{str} is not found."
     end
   end
 end
