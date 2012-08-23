@@ -12,5 +12,9 @@ module VhdlDoctest::Types
         raise "unacceptable value error #{v}"
       end
     end
+
+    def self.parse(str)
+      new if str.strip == 'std_logic'
+    end
   end
 end
