@@ -10,6 +10,10 @@ module VhdlDoctest
       @entity, @ports, @cases = entity, ports, cases
     end
 
+    def test_file
+      TestFile.new(@entity, @ports, @cases)
+    end
+
     class DoctestParser
       def initialize(path)
         @vhdl = File.read(path)

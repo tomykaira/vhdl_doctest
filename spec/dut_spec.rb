@@ -8,6 +8,9 @@ module VhdlDoctest
     its(:entity) { should == "alu" }
     it { should have(5).ports }
     it { should have(8).cases }
+
+    its('test_file.test_name') { should == 'testbench_alu' }
+    its(:test_file) { should have(8).cases }
   end
 
   describe DUT::DoctestParser do
