@@ -13,7 +13,7 @@ module VhdlDoctest
   RSpec::Matchers.define :assert do |expected|
     match do |actual|
       expected.all? { |k, v| actual.out_mapping.
-        find { |port, value| port.name == k.to_s && v == value } }
+        find { |port, value| port.name == k.to_s && (v == nil || v == value) } }
     end
   end
 
@@ -72,7 +72,7 @@ module VhdlDoctest
 -- /TEST
 }}
 
-      it { cases.first.should set(a: 16, b: 32, control: 2) }
+      specify { cases.first.should set(a: 16, b: 32, control: 2) }
     end
 
     describe 'wrong input for redix' do
@@ -84,6 +84,20 @@ module VhdlDoctest
 }}
 
       it { expect{ cases }.to raise_error(OutOfRangeSymbolError, /control.*binary.*012/) }
+    end
+
+    describe 'dont care in assertion' do
+      let(:input) { %q{
+-- TEST
+-- a   | b   | control b | output | zero
+-- 10  | 20  | 010       | 30     | 0
+-- 10  | -10 |           | 0      | -
+-- /TEST
+}}
+
+      specify('second') { cases[0].should assert(output: 30, zero: 0) }
+      specify('second') { cases[1].should set(a: 10, b: -10, control: 2) }
+      specify('second') { cases[1].should_not assert([:zero]) }
     end
   end
 end

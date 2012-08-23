@@ -28,7 +28,7 @@ module VhdlDoctest
                 when 2
                   %w{ 0 1 }
                 when 10
-                  ("0".."9").to_a
+                  ("0".."9").to_a + %w{ - }
                 when 16
                   ("0".."9").to_a + ("a".."f").to_a
                 else
@@ -60,8 +60,13 @@ module VhdlDoctest
           if l[idx].empty?
             l[idx] = prev
           else
-            assert_in_range(port_name, radix, l[idx])
-            prev = l[idx] = l[idx].to_i(radix)
+            if l[idx].strip.match(/^-+$/)
+              l[idx] = :dont_care
+            else
+              assert_in_range(port_name, radix, l[idx])
+              l[idx] = l[idx].to_i(radix)
+            end
+            prev = l[idx]
           end
         end
       end

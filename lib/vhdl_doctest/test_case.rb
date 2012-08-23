@@ -3,6 +3,7 @@ module VhdlDoctest
     attr_reader :in_mapping, :out_mapping
     def initialize(mapping)
       @in_mapping, @out_mapping = mapping.partition{ |port, _| port.in? }
+      @out_mapping.select!{ |k, v| v != :dont_care }
     end
 
     def to_vhdl
