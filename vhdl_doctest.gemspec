@@ -4,8 +4,8 @@ require File.expand_path('../lib/vhdl_doctest/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["tomykaira"]
   gem.email         = ["tomykaira@gmail.com"]
-  gem.description   = %q{Run parameterized test for VHDL written in doctest-like format}
-  gem.summary       = %q{Run parameterized test for VHDL written in doctest-like format}
+  gem.description   = %q{Run parameterized test for VHDL written in doctest-like format.}
+  gem.summary       = %q{Run parameterized test for VHDL written in doctest-like format.}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
