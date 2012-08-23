@@ -60,6 +60,8 @@ If you found a bug (or unexpected movement), let me know.  Please attach your vh
 
 Any feature request is welcome.  I appreciate if it have an example, or a test case.
 
+I am noob about hardware, and VHDL.  If you have knowledge about hardware testing, give me advice.
+
 ## Contributing
 
 1. Fork it
