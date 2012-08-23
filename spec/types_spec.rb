@@ -19,6 +19,16 @@ module VhdlDoctest
         let(:string) { 'std_logic_vector(0 upto 8)' }
         it { expect { subject }.to raise_error }
       end
+
+      describe 'upcase STD_LOGIC' do
+        let(:string) { 'STD_LOGIC' }
+        it { should be_a Types::StdLogic }
+      end
+
+      describe 'upcase STD_LOGIC_VECTOR' do
+        let(:string) { 'STD_LOGIC_VECTOR(2 DOWNTO 0)' }
+        it { should be_a Types::StdLogicVector }
+      end
     end
   end
 end

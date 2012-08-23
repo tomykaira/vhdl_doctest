@@ -14,7 +14,7 @@ module VhdlDoctest::Types
 
     def self.parse(str)
       str = str.strip
-      if str.match(/\Astd_logic_vector/)
+      if str.match(/\Astd_logic_vector/i)
         if str.strip.match(/\((\d+)\s+downto\s+0\)\Z/i)
           new($1.to_i + 1)
         else
