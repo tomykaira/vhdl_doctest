@@ -50,5 +50,18 @@ module VhdlDoctest
       its(:first) { should set(a: 3, b: 5, control: 2) }
       its(:first) { should assert(output: 8, zero: 0) }
     end
+
+    describe 'two cases with an empty column' do
+      let(:input) { %q{
+-- TEST
+-- a | b | control | output | zero
+-- 3 | 5 | 2       | 8      | 0
+-- 9 |   | 2       | 14     | 0
+-- /TEST
+}}
+
+      it { should have(2).items }
+      its(:last) { should set(a: 9, b: 5, control: 2) }
+    end
   end
 end
