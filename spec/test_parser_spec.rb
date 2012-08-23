@@ -63,5 +63,16 @@ module VhdlDoctest
       it { should have(2).items }
       its(:last) { should set(a: 9, b: 5, control: 2) }
     end
+
+    describe 'field redix specification' do
+      let(:input) { %q{
+-- TEST
+-- a h | b x | control b | output | zero
+-- 10  | 20  | 010       | 8      | 0
+-- /TEST
+}}
+
+      it { cases.first.should set(a: 16, b: 32, control: 2) }
+    end
   end
 end
