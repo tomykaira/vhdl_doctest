@@ -68,3 +68,7 @@ Any feature request is welcome.  I appreciate if it have an example, or a test c
 4. Write tests with rspec for your changes
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create new Pull Request
+
+## References
+
+Utility functions in a generated test file are from http://www.eda-stds.org/vhdl-200x/vhdl-200x-ft/packages_old/ .
