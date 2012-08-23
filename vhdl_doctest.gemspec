@@ -16,4 +16,5 @@ Gem::Specification.new do |gem|
   gem.version       = VhdlDoctest::VERSION
 
   gem.add_development_dependency 'rspec', '~> 2.11'
+  gem.add_development_dependency 'rake'
 end
