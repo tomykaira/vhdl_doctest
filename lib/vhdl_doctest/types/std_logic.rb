@@ -14,7 +14,7 @@ module VhdlDoctest::Types
     end
 
     def self.parse(str)
-      new if str.strip == 'std_logic'
+      new if str.strip.downcase == 'std_logic'
     end
   end
 end
