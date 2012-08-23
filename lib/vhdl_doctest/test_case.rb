@@ -1,5 +1,6 @@
 module VhdlDoctest
   class TestCase
+    attr_reader :in_mapping, :out_mapping
     def initialize(mapping)
       @in_mapping, @out_mapping = mapping.partition{ |port, _| port.in? }
     end

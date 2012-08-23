@@ -1,6 +1,22 @@
 require 'spec_helper'
 
 module VhdlDoctest
+  # Expect TestCase to set given hash pairs as stimulus
+  RSpec::Matchers.define :set do |expected|
+    match do |actual|
+      expected.all? { |k, v| actual.in_mapping.
+        find { |port, value| port.name == k.to_s && v == value } }
+    end
+  end
+
+  # Expect TestCase to assert given hash pairs
+  RSpec::Matchers.define :assert do |expected|
+    match do |actual|
+      expected.all? { |k, v| actual.out_mapping.
+        find { |port, value| port.name == k.to_s && v == value } }
+    end
+  end
+
   describe TestParser do
     let(:ports) {[
         Port.new("a",       :in, Types::StdLogicVector.new(32)),
@@ -9,7 +25,7 @@ module VhdlDoctest
         Port.new("output",  :out, Types::StdLogicVector.new(32)),
         Port.new("zero",    :out, Types::StdLogic.new)
       ]}
-    let(:cases) { TestParser.parse(ports, input) }
+    subject(:cases) { TestParser.parse(ports, input) }
 
     describe 'header only' do
       let(:input) { %q{
@@ -20,6 +36,19 @@ module VhdlDoctest
       it 'should not fail to parse' do
         expect(cases).to have(0).items
       end
+    end
+
+    describe 'single case' do
+      let(:input) { %q{
+-- TEST
+-- a | b | control | output | zero
+-- 3 | 5 | 2       | 8      | 0
+-- /TEST
+}}
+
+      it { should have(1).item }
+      its(:first) { should set(a: 3, b: 5, control: 2) }
+      its(:first) { should assert(output: 8, zero: 0) }
     end
   end
 end
