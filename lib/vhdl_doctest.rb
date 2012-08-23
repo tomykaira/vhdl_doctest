@@ -5,6 +5,7 @@ require "vhdl_doctest/types"
 require "vhdl_doctest/test_file"
 require "vhdl_doctest/test_case"
 require "vhdl_doctest/dut"
+require "vhdl_doctest/test_parser"
 
 module VhdlDoctest
   # Your code goes here...
