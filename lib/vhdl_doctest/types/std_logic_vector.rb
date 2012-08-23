@@ -18,7 +18,7 @@ module VhdlDoctest::Types
         if str.strip.match(/\((\d+)\s+downto\s+0\)\Z/i)
           new($1.to_i + 1)
         else
-          raise "#{ str } is str_logic_vector, but not 'x downto 0'"
+          raise "#{ str } is std_logic_vector, but not 'x downto 0'"
         end
       end
     end
