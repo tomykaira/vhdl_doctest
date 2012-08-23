@@ -14,4 +14,6 @@ Gem::Specification.new do |gem|
   gem.name          = "vhdl_doctest"
   gem.require_paths = ["lib"]
   gem.version       = VhdlDoctest::VERSION
+
+  gem.add_development_dependency 'rspec', '~> 2.11'
 end
