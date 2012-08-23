@@ -1,4 +1,20 @@
 module VhdlDoctest
+  class OutOfRangeSymbolError < RuntimeError
+    def initialize(port, radix, bad_value)
+      @port, @bad_value = port, bad_value
+
+      @radix = case radix
+               when 2;  'binary'
+               when 10; 'decimal'
+               when 16; 'hex'
+               end
+    end
+
+    def to_s
+      "#@port expects #@radix, but received #@bad_value"
+    end
+  end
+
   module TestParser
     extend self
     def parse(ports, vhdl)
@@ -7,14 +23,32 @@ module VhdlDoctest
     end
 
     private
+    def assert_in_range(port_name, radix, string)
+      symbols = case radix
+                when 2
+                  %w{ 0 1 }
+                when 10
+                  ("0".."9").to_a
+                when 16
+                  ("0".."9").to_a + ("a".."f").to_a
+                else
+                  []
+                end
+
+      unless string.split(//).all? { |s| symbols.include? s }
+        raise OutOfRangeSymbolError.new(port_name, radix, string)
+      end
+    end
+
     def extract_values(vhdl)
       definitions = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1]
       header, *body = definitions.split("\n").map { |l| l[3..-1].split("|").map(&:strip) }
 
       header.each_with_index do |h, idx|
         radix = 10
-        if h.include?(' ')
-          case h[-1]
+        port_name, attr = h.split(' ', 2)
+        if attr
+          case attr[-1]
           when 'b'
             radix = 2
           when 'h', 'x'
@@ -26,6 +60,7 @@ module VhdlDoctest
           if l[idx].empty?
             l[idx] = prev
           else
+            assert_in_range(port_name, radix, l[idx])
             prev = l[idx] = l[idx].to_i(radix)
           end
         end

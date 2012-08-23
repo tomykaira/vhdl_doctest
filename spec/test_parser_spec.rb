@@ -74,5 +74,16 @@ module VhdlDoctest
 
       it { cases.first.should set(a: 16, b: 32, control: 2) }
     end
+
+    describe 'wrong input for redix' do
+      let(:input) { %q{
+-- TEST
+-- a h | b x | control b | output | zero
+-- 10  | 20  | 012       | 8      | 0
+-- /TEST
+}}
+
+      it { expect{ cases }.to raise_error(OutOfRangeSymbolError, /control.*binary.*012/) }
+    end
   end
 end
