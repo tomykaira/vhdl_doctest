@@ -99,5 +99,27 @@ module VhdlDoctest
       specify('second') { cases[1].should set(a: 10, b: -10, control: 2) }
       specify('second') { cases[1].should_not assert([:zero]) }
     end
+
+    describe 'dont care in stimuli' do
+      let(:input) { %q{
+-- TEST
+-- a   | b   | control b | output | zero
+-- 10  | -   | 010       | 30     | 0
+-- /TEST
+}}
+
+      specify { expect{ cases }.to raise_error(NotImplementedError) }
+    end
+
+    describe 'all assertions are dont_care' do
+      let(:input) { %q{
+-- TEST
+-- a   | b   | control | output | zero
+-- 10  | -10 | 2       | -      | -
+-- /TEST
+}}
+
+      specify { cases.first.to_vhdl.should_not match /assert/ }
+    end
   end
 end
