@@ -18,8 +18,9 @@ module VhdlDoctest
   module TestParser
     extend self
     def parse(ports, vhdl)
-      vectors = extract_values(vhdl)
-      vectors.map { |v| TestCase.new(Hash[ports.zip(v)]) }
+      names, vectors = extract_values(vhdl)
+      defined_ports = names.map { |name| ports.find { |p| p.name == name } }
+      vectors.map { |v| TestCase.new(Hash[defined_ports.zip(v)]) }
     end
 
     private
@@ -43,10 +44,12 @@ module VhdlDoctest
     def extract_values(vhdl)
       definitions = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1]
       header, *body = definitions.split("\n").map { |l| l[3..-1].split("|").map(&:strip) }
+      port_names = []
 
       header.each_with_index do |h, idx|
         radix = 10
         port_name, attr = h.split(' ', 2)
+        port_names << port_name
         if attr
           case attr[-1]
           when 'b'
@@ -70,7 +73,7 @@ module VhdlDoctest
           end
         end
       end
-      body
+      [port_names, body]
     end
   end
 end

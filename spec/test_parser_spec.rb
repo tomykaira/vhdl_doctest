@@ -121,5 +121,17 @@ module VhdlDoctest
 
       specify { cases.first.to_vhdl.should_not match /assert/ }
     end
+
+    describe 'partial specification' do
+      let(:input) { %q{
+-- TEST
+-- a   | b   | control | zero
+-- 10  | -10 | 2       | 1
+-- /TEST
+}}
+
+      specify { cases.first.should assert(zero: 1) }
+      specify { cases.first.should_not assert([:control]) }
+    end
   end
 end
