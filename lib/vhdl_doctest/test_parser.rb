@@ -52,7 +52,8 @@ module VhdlDoctest
     end
 
     def test_definitions(vhdl)
-      vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].split("\n")
+      lines = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].split("\n")
+      lines.partition { |l| l.include? 'alias' }
     rescue
       raise "Test definition not found"
     end
@@ -68,8 +69,15 @@ module VhdlDoctest
       end
     end
 
+    def replace_aliases(defs, table)
+      pairs = defs.map { |l| l.match(/alias\s+(.*)\s+(.*)$/)[1..2] }
+      table.each { |l| pairs.each { |p| l.gsub!(p[0], p[1]) } }
+      table
+    end
+
     def extract_values(vhdl)
-      header, *body = test_definitions(vhdl).map { |l| extract_fields remove_comment l }
+      table = replace_aliases(*test_definitions(vhdl))
+      header, *body = table.map { |l| extract_fields remove_comment l }
       port_names = []
 
       header.each_with_index do |h, idx|

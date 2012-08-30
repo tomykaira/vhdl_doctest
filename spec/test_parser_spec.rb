@@ -146,5 +146,20 @@ module VhdlDoctest
       specify { cases.first.should assert(zero: 1) }
       specify { cases.last.should assert(zero: 1) }
     end
+
+    describe 'alias' do
+      let(:input) { %q{
+-- TEST
+-- alias TRUE 1
+-- alias FALSE 0
+-- a   | b   | control | zero
+-- 10  | -10 | 2       | TRUE
+-- 10  | 10  | 2       | FALSE
+-- /TEST
+}}
+
+      specify { cases.first.should assert(zero: 1) }
+      specify { cases.last.should assert(zero: 0) }
+    end
   end
 end
