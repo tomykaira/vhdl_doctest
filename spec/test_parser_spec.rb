@@ -95,9 +95,9 @@ module VhdlDoctest
 -- /TEST
 }}
 
-      specify('second') { cases[0].should assert(output: 30, zero: 0) }
-      specify('second') { cases[1].should set(a: 10, b: -10, control: 2) }
-      specify('second') { cases[1].should_not assert([:zero]) }
+      specify { cases[0].should assert(output: 30, zero: 0) }
+      specify { cases[1].should set(a: 10, b: -10, control: 2) }
+      specify { cases[1].should_not assert([:zero]) }
     end
 
     describe 'dont care in stimuli' do
@@ -132,6 +132,19 @@ module VhdlDoctest
 
       specify { cases.first.should assert(zero: 1) }
       specify { cases.first.should_not assert([:control]) }
+    end
+
+    describe 'comment' do
+      let(:input) { %q{
+-- TEST
+-- a   | b   | control | zero # header
+-- 10  | -10 | 2       | 1    # case1
+-- 10  |     | 2       | 1    # case2 # important
+-- /TEST
+}}
+
+      specify { cases.first.should assert(zero: 1) }
+      specify { cases.last.should assert(zero: 1) }
     end
   end
 end

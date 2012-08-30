@@ -41,24 +41,42 @@ module VhdlDoctest
       end
     end
 
+    def remove_comment(line)
+      line.match(/--\s*([^#]*)/)[1]
+    rescue
+      raise "line: #{line} is not formatted correctly"
+    end
+
+    def extract_fields(line)
+      line.split("|").map(&:strip)
+    end
+
+    def test_definitions(vhdl)
+      vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].split("\n")
+    rescue
+      raise "Test definition not found"
+    end
+
+    def radix(attr)
+      if attr
+        case attr[-1]
+        when 'b';      2
+        when 'h', 'x'; 16
+        end
+      else
+        10
+      end
+    end
+
     def extract_values(vhdl)
-      definitions = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1]
-      header, *body = definitions.split("\n").map { |l| l[3..-1].split("|").map(&:strip) }
+      header, *body = test_definitions(vhdl).map { |l| extract_fields remove_comment l }
       port_names = []
 
       header.each_with_index do |h, idx|
-        radix = 10
         port_name, attr = h.split(' ', 2)
         port_names << port_name
-        if attr
-          case attr[-1]
-          when 'b'
-            radix = 2
-          when 'h', 'x'
-            radix = 16
-          end
-        end
         prev = ''
+        radix = radix(attr)
         body.each do |l|
           if l[idx].empty?
             l[idx] = prev
