@@ -85,8 +85,17 @@ module VhdlDoctest
         port_names << port_name
         prev = ''
         radix = radix(attr)
+        body.select! do |l|
+          if l.empty?
+            false
+          elsif ! l[idx]
+            warn l.join(" | ") + " does not have enough columns"
+            false
+          else
+            true
+          end
+        end
         body.each do |l|
-          next if l.empty?
           if l[idx].empty?
             l[idx] = prev
           else

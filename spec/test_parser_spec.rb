@@ -162,5 +162,17 @@ module VhdlDoctest
       specify { cases.first.should assert(zero: 1) }
       specify { cases.last.should assert(zero: 0) }
     end
+
+    describe 'not enough fields' do
+      let(:input) { %q{
+-- TEST
+-- a   | b   | control | zero
+-- 10  | -10 | 2       | 0
+-- 10  | 10
+-- /TEST
+}}
+
+      specify { cases.should  have(1).item }
+    end
   end
 end
