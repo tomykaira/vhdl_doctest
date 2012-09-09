@@ -139,6 +139,7 @@ module VhdlDoctest
 -- TEST
 -- a   | b   | control | zero # header
 -- 10  | -10 | 2       | 1    # case1
+-- # whole comment line
 -- 10  |     | 2       | 1    # case2 # important
 -- /TEST
 }}

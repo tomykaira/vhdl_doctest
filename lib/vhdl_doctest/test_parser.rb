@@ -86,6 +86,7 @@ module VhdlDoctest
         prev = ''
         radix = radix(attr)
         body.each do |l|
+          next if l.empty?
           if l[idx].empty?
             l[idx] = prev
           else
