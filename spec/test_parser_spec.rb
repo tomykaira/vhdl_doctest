@@ -139,6 +139,7 @@ module VhdlDoctest
 -- TEST
 -- a   | b   | control | zero # header
 -- 10  | -10 | 2       | 1    # case1
+-- # whole comment line
 -- 10  |     | 2       | 1    # case2 # important
 -- /TEST
 }}
@@ -151,6 +152,7 @@ module VhdlDoctest
       let(:input) { %q{
 -- TEST
 -- alias TRUE 1
+-- # comment between alias
 -- alias FALSE 0
 -- a   | b   | control | zero
 -- 10  | -10 | 2       | TRUE
@@ -160,6 +162,18 @@ module VhdlDoctest
 
       specify { cases.first.should assert(zero: 1) }
       specify { cases.last.should assert(zero: 0) }
+    end
+
+    describe 'not enough fields' do
+      let(:input) { %q{
+-- TEST
+-- a   | b   | control | zero
+-- 10  | -10 | 2       | 0
+-- 10  | 10
+-- /TEST
+}}
+
+      specify { cases.should  have(1).item }
     end
   end
 end

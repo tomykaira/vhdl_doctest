@@ -52,7 +52,10 @@ module VhdlDoctest
     end
 
     def test_definitions(vhdl)
-      lines = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].split("\n")
+      lines = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].
+        gsub(/\#.*$/, '').     # remove comments
+        gsub(/--\s*\n/m, '').  # remove blank lines
+        split("\n")
       lines.partition { |l| l.include? 'alias' }
     rescue
       raise "Test definition not found"
@@ -85,6 +88,16 @@ module VhdlDoctest
         port_names << port_name
         prev = ''
         radix = radix(attr)
+        body.select! do |l|
+          if l.empty?
+            false
+          elsif ! l[idx]
+            warn l.join(" | ") + " does not have enough columns"
+            false
+          else
+            true
+          end
+        end
         body.each do |l|
           if l[idx].empty?
             l[idx] = prev
