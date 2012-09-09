@@ -52,7 +52,10 @@ module VhdlDoctest
     end
 
     def test_definitions(vhdl)
-      lines = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].split("\n")
+      lines = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].
+        gsub(/\#.*$/, '').     # remove comments
+        gsub(/--\s*\n/m, '').  # remove blank lines
+        split("\n")
       lines.partition { |l| l.include? 'alias' }
     rescue
       raise "Test definition not found"

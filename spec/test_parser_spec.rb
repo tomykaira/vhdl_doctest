@@ -152,6 +152,7 @@ module VhdlDoctest
       let(:input) { %q{
 -- TEST
 -- alias TRUE 1
+-- # comment between alias
 -- alias FALSE 0
 -- a   | b   | control | zero
 -- 10  | -10 | 2       | TRUE
