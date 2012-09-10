@@ -94,7 +94,7 @@ module VhdlDoctest
     end
 
     def replace_aliases(aliases, case_table)
-      pairs = aliases.map { |l| l.match(/alias\s+(.*)\s+(.*)$/)[1..2] }
+      pairs = aliases.map { |l| l.match(/alias\s+([^ \t]*)\s+([^ \t]*)\s*$/)[1..2] }
       pairs.sort_by! { |k,v| -k.length }  # use longer alias first
       case_table.each { |l| pairs.each { |p| l.gsub!(p[0], p[1]) } }
       case_table
