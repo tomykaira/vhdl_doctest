@@ -9,7 +9,7 @@ module VhdlDoctest::Types
     end
 
     def format(v)
-      '"' + v.to_s(2).rjust(@length, '0')+ '"'
+      '"' + (2**@length + v).to_s(2)[-@length.. -1]+ '"'
     end
 
     def self.parse(str)
