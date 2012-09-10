@@ -25,7 +25,7 @@ module VhdlDoctest
         Port.new("output",  :out, Types::StdLogicVector.new(32)),
         Port.new("zero",    :out, Types::StdLogic.new)
       ]}
-    subject(:cases) { TestParser.parse(ports, input) }
+    subject(:cases) { TestParser.new(input).parse(ports) }
 
     describe 'header only' do
       let(:input) { %q{
@@ -83,7 +83,7 @@ module VhdlDoctest
 -- /TEST
 }}
 
-      it { expect{ cases }.to raise_error(OutOfRangeSymbolError, /control.*binary.*012/) }
+      it { expect{ cases }.to raise_error(OutOfRangeSymbolError) }
     end
 
     describe 'dont care in assertion' do
@@ -164,6 +164,21 @@ module VhdlDoctest
       specify { cases.last.should assert(zero: 0) }
     end
 
+    describe 'use a longer alias first' do
+      let(:input) { %q{
+-- TEST
+-- alias FOO 1
+-- alias FOOBAR 0
+-- a   | b   | control | zero
+-- 10  | -10 | 2       | FOO
+-- 10  | 10  | 2       | FOOBAR
+-- /TEST
+}}
+
+      specify { cases.first.should assert(zero: 1) }
+      specify { cases.last.should assert(zero: 0) }
+    end
+
     describe 'not enough fields' do
       let(:input) { %q{
 -- TEST
@@ -174,6 +189,39 @@ module VhdlDoctest
 }}
 
       specify { cases.should  have(1).item }
+    end
+
+    describe 'custom field style' do
+      let(:input) { %q{
+-- TEST
+-- def f { |x| x.include?(".") ? [x.to_f].pack('f').unpack('I').first : x.to_i }
+-- a   f | b | control | zero
+--    10 | 1 | 0       | 0
+--  10.0 | 0 | 0       | 0
+-- /TEST
+}}
+
+      its(:first) { should set(a: 10) }
+      its(:last) { should set(a: 1092616192) }
+    end
+
+    describe '#decode' do
+      def decode(*args)
+        described_class.new(nil).decode(*args)
+      end
+      describe 'd' do
+        specify { decode('d', '10').should == 10 }
+        specify { decode('d', '-10').should == -10 }
+        specify { expect{ decode('d', 'hoge') }.to raise_error(OutOfRangeSymbolError) }
+      end
+    end
+
+    describe 'create lambda from def' do
+      it 'should define lambda with given name' do
+        name, proc = described_class.new(nil).def_to_lambda("def f { |x| x }")
+        name.should == 'f'
+        proc.call(3).should == 3
+      end
     end
   end
 end

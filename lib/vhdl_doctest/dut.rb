@@ -22,7 +22,7 @@ module VhdlDoctest
       def parse
         entity = @vhdl.match(/entity\s+(.*)\s+is/)[1]
         ports = extract_ports
-        cases = TestParser.parse(ports, @vhdl)
+        cases = TestParser.new(@vhdl).parse(ports)
 
         [entity, ports, cases]
       end
