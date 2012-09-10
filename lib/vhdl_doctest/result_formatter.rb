@@ -9,15 +9,13 @@ module VhdlDoctest
       if compile_error?
         "FAILED: Test did not run because of compilation error"
       else
-        format = []
-        @output.split("\n").each do |l|
+        lines.reduce([]) do |formatted, l|
           if l.match(/(FAILED: .*) expected to (.*), but (.*)/)
-            format << $1
-            format << "  expected: " + $2
-            format << "    actual: " + replace_binary($3)
+            formatted << $1
+            formatted << "  expected: " + $2
+            formatted << "    actual: " + replace_binary($3)
           end
-        end
-        format.join("\n")
+        end.join("\n")
       end
     end
 
@@ -34,12 +32,17 @@ module VhdlDoctest
     end
 
     def count_failure
-      @output.split("\n").select{ |l| l.match(/FAILED/) }.count
+      lines.select{ |l| l.match(/FAILED/) }.count
     end
 
     # convert binary expression in a string to decimal
     def replace_binary(str)
       str.gsub(/[01]+/) { |bin| bin.to_i(2).to_s(10) }
+    end
+
+    private
+    def lines
+      @output.split("\n")
     end
   end
 end
