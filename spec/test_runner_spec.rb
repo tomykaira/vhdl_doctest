@@ -32,6 +32,12 @@ module VhdlDoctest
 
         it { should match "1 examples, 0 failures" }
       end
+
+      context "result including minus" do
+        let(:file) { test_file([[-18, -9, 2, -27, 0]]) }
+
+        it { should match "1 examples, 0 failures" }
+      end
     end
 
     def test_file(cases)
