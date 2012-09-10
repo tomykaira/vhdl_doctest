@@ -56,25 +56,38 @@ module VhdlDoctest
       line.split("|").map(&:strip)
     end
 
-    def test_definitions(vhdl)
+    def test_block(vhdl)
       lines = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].
         gsub(/\#.*$/, '').     # remove comments
-        gsub(/--\s*\n/m, '').  # remove blank lines
+        gsub(/^---*[ \t]*/, '').  # remove VHDL comments
+        gsub(/^\s*\n/m, '').    # remove blank lines
         split("\n")
-      lines.partition { |l| l.include? 'alias' }
+    end
+
+    def test_definition(vhdl)
+      empty = { aliases: [], functions: [], cases: [] }
+      test_block(vhdl).reduce(empty) do |m, l|
+        case l
+        when /^alias/; m[:aliases]   << l
+        when /^def/;   m[:functions] << l
+        else;          m[:cases]     << l
+        end
+        m
+      end
     rescue
       raise "Test definition not found"
     end
 
-    def replace_aliases(defs, table)
-      pairs = defs.map { |l| l.match(/alias\s+(.*)\s+(.*)$/)[1..2] }
-      table.each { |l| pairs.each { |p| l.gsub!(p[0], p[1]) } }
-      table
+    def replace_aliases(aliases, case_table)
+      pairs = aliases.map { |l| l.match(/alias\s+(.*)\s+(.*)$/)[1..2] }
+      case_table.each { |l| pairs.each { |p| l.gsub!(p[0], p[1]) } }
+      case_table
     end
 
     def extract_values(vhdl)
-      table = replace_aliases(*test_definitions(vhdl))
-      header, *body = table.map { |l| extract_fields remove_comment l }
+      definition = test_definition(vhdl)
+      table = replace_aliases(definition[:aliases], definition[:cases])
+      header, *body = table.map { |l| extract_fields l }
       port_names = []
 
       header.each_with_index do |h, idx|
