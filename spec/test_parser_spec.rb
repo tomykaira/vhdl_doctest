@@ -179,7 +179,7 @@ module VhdlDoctest
     describe 'custom field style' do
       let(:input) { %q{
 -- TEST
--- def f(x) { x.include?(".") ? [x.to_f].pack('f').unpack('I').first : x.to_i }
+-- def f { |x| x.include?(".") ? [x.to_f].pack('f').unpack('I').first : x.to_i }
 -- a   f | b | control | zero
 --    10 | 1 | 0       | 0
 --  10.0 | 0 | 0       | 0
