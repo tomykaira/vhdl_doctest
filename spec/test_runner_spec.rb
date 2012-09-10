@@ -40,6 +40,21 @@ module VhdlDoctest
       end
     end
 
+    describe '#create_runner_script' do
+      context 'a dependent module comparator.vhd is specified' do
+        before do
+          dir = nil
+          test_file = double(TestFile, path: '/test_file/path/test.vhd', test_name: 'test')
+          test_file.stub(:create) { |d| dir = d }
+          runner = described_class.new(nil, "/path/to/dut.vhd", test_file, %w{ ./comparator.vhd })
+          runner.create_files
+          @sh = File.join(dir, 'run.sh')
+        end
+        subject { File.read(@sh) }
+        it { should include '/path/to/comparator.vhd' }
+      end
+    end
+
     def test_file(cases)
       ports = [
         Port.new("a",       :in, Types::StdLogicVector.new(32)),
