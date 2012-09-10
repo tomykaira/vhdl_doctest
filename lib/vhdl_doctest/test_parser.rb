@@ -8,6 +8,21 @@ module VhdlDoctest
   class TestParser
     def initialize(vhdl)
       @vhdl = vhdl
+      d = lambda do |x|
+        assert_in_range(("0".."9").to_a + %w{ - }, x)
+        x.to_i
+      end
+
+      h = lambda do |x|
+        assert_in_range(("0".."9").to_a + ("a".."f").to_a, x)
+        x.to_i(16)
+      end
+
+      b = lambda do |x|
+        assert_in_range(%w{ 0 1 }, x)
+        x.to_i(2)
+      end
+      @decoders = { 'd' => d, 'h' => h, 'x' => h, 'b' => b }
     end
 
     def parse(ports)
@@ -16,33 +31,12 @@ module VhdlDoctest
       vectors.map { |v| TestCase.new(Hash[defined_ports.zip(v)]) }
     end
 
-    # read given string as decimal
-    # Return: integer
-    def d(x)
-      assert_in_range(("0".."9").to_a + %w{ - }, x)
-      x.to_i
-    end
-
-    # read given sring as hex
-    # Return: integer
-    def h(x)
-      assert_in_range(("0".."9").to_a + ("a".."f").to_a, x)
-      x.to_i(16)
-    end
-    alias_method :x, :h
-
-    # read given sring as binary
-    # Return: integer
-    def b(x)
-      assert_in_range(%w{ 0 1 }, x)
-      x.to_i(2)
-    end
-
+    # find decoder to decode given value
     def decode(decoder, value)
-      if @decoders && fun = @decoders[decoder]
+      if fun = @decoders[decoder || 'd']
         fun.call(value)
       else
-        self.__send__(decoder || 'd', value)
+        raise "Cannot decode #{value} with decoder #{decoder}.  Unknown decoder."
       end
     end
 
@@ -57,7 +51,7 @@ module VhdlDoctest
     end
 
     def register_decoder(defs)
-      @decoders = Hash[defs.map{ |d| def_to_lambda(d) }]
+      @decoders.merge! Hash[defs.map{ |d| def_to_lambda(d) }]
     end
 
     private
