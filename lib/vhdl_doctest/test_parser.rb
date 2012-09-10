@@ -35,11 +35,11 @@ module VhdlDoctest
       x.to_i(2)
     end
 
-    def decode(function, value)
-      if @functions && fun = @functions[function]
+    def decode(decoder, value)
+      if @decoders && fun = @decoders[decoder]
         fun.call(value)
       else
-        self.__send__(function || 'd', value)
+        self.__send__(decoder || 'd', value)
       end
     end
 
@@ -53,8 +53,8 @@ module VhdlDoctest
       end
     end
 
-    def register_function(defs)
-      @functions = Hash[defs.map{ |d| def_to_lambda(d) }]
+    def register_decoder(defs)
+      @decoders = Hash[defs.map{ |d| def_to_lambda(d) }]
     end
 
     private
@@ -76,19 +76,19 @@ module VhdlDoctest
 
     def test_block(vhdl)
       lines = vhdl.match(/-- TEST\n(.*)-- \/TEST/m)[1].
-        gsub(/\#.*$/, '').     # remove comments
+        gsub(/\#.*$/, '').        # remove comments
         gsub(/^---*[ \t]*/, '').  # remove VHDL comments
-        gsub(/^\s*\n/m, '').    # remove blank lines
+        gsub(/^\s*\n/m, '').      # remove blank lines
         split("\n")
     end
 
     def test_definition(vhdl)
-      empty = { aliases: [], functions: [], cases: [] }
+      empty = { aliases: [], decoders: [], cases: [] }
       test_block(vhdl).reduce(empty) do |m, l|
         case l
-        when /^alias/; m[:aliases]   << l
-        when /^def/;   m[:functions] << l
-        else;          m[:cases]     << l
+        when /^alias/; m[:aliases]  << l
+        when /^def/;   m[:decoders] << l
+        else;          m[:cases]    << l
         end
         m
       end
@@ -104,7 +104,7 @@ module VhdlDoctest
 
     def extract_values(vhdl)
       definition = test_definition(vhdl)
-      register_function(definition[:functions])
+      register_decoder(definition[:decoders])
       table = replace_aliases(definition[:aliases], definition[:cases])
       header, *body = table.map { |l| extract_fields l }
       port_names = []
