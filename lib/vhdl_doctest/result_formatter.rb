@@ -33,6 +33,10 @@ module VhdlDoctest
       @output.include?("FAILED")
     end
 
+    def count_failure
+      @output.split("\n").select{ |l| l.match(/FAILED/) }.count
+    end
+
     # convert binary expression in a string to decimal
     def replace_binary(str)
       str.gsub(/[01]+/) { |bin| bin.to_i(2).to_s(10) }

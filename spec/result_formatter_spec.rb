@@ -35,6 +35,7 @@ FAILED: op = 44, rx_done = 0, stage = 1
     actual: next_stage = 2, bus_to_reg = 0, alu_src = 1, pc_src = 0, reg_dst = 0, alu_control = 0, mem_write = 0, send_enable = 0, reg_write = 0, rx_enable = 0
 }.strip
       end
+      its(:count_failure) { should == 1 }
     end
 
     describe '#replace_binary' do
