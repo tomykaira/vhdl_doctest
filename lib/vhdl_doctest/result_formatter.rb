@@ -15,6 +15,7 @@ module VhdlDoctest
             formatted << "  expected: " + $2
             formatted << "    actual: " + replace_binary($3)
           end
+          formatted
         end.join("\n")
       end
     end

@@ -39,8 +39,12 @@ module VhdlDoctest
     end
 
     def report_result
-      failures = @result.split("\n").select { |l| l.include?('FAILED') }
-      @out << "\n#{@test_file.cases.size} examples, #{failures.size} failures\n"
+      formatter = ResultFormatter.new(@result)
+      @out << "\n\n\n"
+      @out << formatter.format
+      unless formatter.compile_error?
+        @out << "\n#{@test_file.cases.size} examples, #{formatter.count_failure} failures\n"
+      end
       @out << "\nTest directory: #{@dir}\n"
     end
   end
