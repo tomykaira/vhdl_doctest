@@ -103,6 +103,38 @@ module VhdlDoctest
       case_table
     end
 
+    def remove_invalid_lines(body, idx)
+      body.select do |l|
+        if l.empty?
+          false
+        elsif ! l[idx]
+          warn l.join(" | ") + " does not have enough columns"
+          false
+        else
+          true
+        end
+      end
+    end
+
+    # fill empty cells inheriting the above value
+    # decode string into :dont_care or integer
+    # destructively change body
+    def normalize_testcases(body, idx, decoder)
+      prev = ''
+      body.each do |l|
+        if l[idx].empty?
+          l[idx] = prev
+        else
+          if l[idx].strip.match(/^-+$/)
+            l[idx] = :dont_care
+          else
+            l[idx] = decode(decoder, l[idx])
+          end
+          prev = l[idx]
+        end
+      end
+    end
+
     def extract_values(vhdl)
       definition = test_definition(vhdl)
       register_decoder(definition[:decoders])
@@ -111,31 +143,10 @@ module VhdlDoctest
       port_names = []
 
       header.each_with_index do |h, idx|
-        port_name, attr = h.split(' ', 2)
+        port_name, decoder_name = h.split(' ', 2)
         port_names << port_name
-        prev = ''
-        body.select! do |l|
-          if l.empty?
-            false
-          elsif ! l[idx]
-            warn l.join(" | ") + " does not have enough columns"
-            false
-          else
-            true
-          end
-        end
-        body.each do |l|
-          if l[idx].empty?
-            l[idx] = prev
-          else
-            if l[idx].strip.match(/^-+$/)
-              l[idx] = :dont_care
-            else
-              l[idx] = decode(attr, l[idx])
-            end
-            prev = l[idx]
-          end
-        end
+        body = remove_invalid_lines(body, idx)
+        normalize_testcases(body, idx, decoder_name)
       end
       [port_names, body]
     end
