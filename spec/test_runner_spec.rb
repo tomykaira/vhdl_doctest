@@ -29,6 +29,7 @@ module VhdlDoctest
         before { described_class.new(out, dut_file, file).run }
 
         it { should match "1 examples, 1 failures" }
+        it { should match "actual:" }
       end
     end
 
