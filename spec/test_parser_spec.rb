@@ -175,5 +175,19 @@ module VhdlDoctest
 
       specify { cases.should  have(1).item }
     end
+
+    describe 'custom field style' do
+      let(:input) { %q{
+-- TEST
+-- def f(x) { x.include?(".") ? [x.to_f].pack('f').unpack('I').first : x.to_i }
+-- a   f | b | control | zero
+--    10 | 1 | 0       | 0
+--  10.0 | 0 | 0       | 0
+-- /TEST
+}}
+
+      its(:first) { should set(a: 10) }
+      its(:last) { should set(a: 1092616192) }
+    end
   end
 end
