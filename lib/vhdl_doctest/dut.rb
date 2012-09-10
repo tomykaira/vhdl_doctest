@@ -27,12 +27,13 @@ module VhdlDoctest
         [entity, ports, cases]
       end
 
+      # this assumes one-line one-port
       def extract_ports
         return @ports if @ports
         @ports = []
-        definitions = @vhdl.match(/entity.*is\s+port\s*\((.*?)\);\s*end/m)[1]
+        definitions = @vhdl.match(/entity\s*(?<entity_name>[a-zA-Z_0-9]*)\s*is\s+port\s*\((?<ports>.*?)\);\s*end\s+\k<entity_name>\s*;/m)[:ports]
         definitions.split("\n").each do |l|
-          names, attributes = l.strip.gsub(/;$/, '').split(":")
+          names, attributes = l.strip.gsub(/;.*$/, '').split(":")
           next unless attributes
           destination, type = attributes.strip.split(' ', 2)
           names.split(',').each do |name|
