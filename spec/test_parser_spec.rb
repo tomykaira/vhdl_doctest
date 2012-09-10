@@ -83,7 +83,7 @@ module VhdlDoctest
 -- /TEST
 }}
 
-      it { expect{ cases }.to raise_error(OutOfRangeSymbolError, /control.*binary.*012/) }
+      it { expect{ cases }.to raise_error(OutOfRangeSymbolError) }
     end
 
     describe 'dont care in assertion' do
@@ -188,6 +188,14 @@ module VhdlDoctest
 
       its(:first) { should set(a: 10) }
       its(:last) { should set(a: 1092616192) }
+    end
+
+    describe '#decode' do
+      describe 'd' do
+        specify { described_class.decode('d', '10').should == 10 }
+        specify { described_class.decode('d', '-10').should == -10 }
+        specify { expect{ described_class.decode('d', 'hoge') }.to raise_error(OutOfRangeSymbolError) }
+      end
     end
   end
 end

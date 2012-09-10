@@ -1,17 +1,7 @@
 module VhdlDoctest
   class OutOfRangeSymbolError < RuntimeError
-    def initialize(port, radix, bad_value)
-      @port, @bad_value = port, bad_value
-
-      @radix = case radix
-               when 2;  'binary'
-               when 10; 'decimal'
-               when 16; 'hex'
-               end
-    end
-
-    def to_s
-      "#@port expects #@radix, but received #@bad_value"
+    def initialize(allowed, bad_value)
+      super("#{ bad_value } includes not allowed symbol(s)")
     end
   end
 
@@ -26,12 +16,14 @@ module VhdlDoctest
     # read given string as decimal
     # Return: integer
     def d(x)
+      assert_in_range(("0".."9").to_a + %w{ - }, x)
       x.to_i
     end
 
     # read given sring as hex
     # Return: integer
     def h(x)
+      assert_in_range(("0".."9").to_a + ("a".."f").to_a, x)
       x.to_i(16)
     end
     alias_method :x, :h
@@ -39,6 +31,7 @@ module VhdlDoctest
     # read given sring as binary
     # Return: integer
     def b(x)
+      assert_in_range(%w{ 0 1 }, x)
       x.to_i(2)
     end
 
@@ -47,20 +40,9 @@ module VhdlDoctest
     end
 
     private
-    def assert_in_range(port_name, radix, string)
-      symbols = case radix
-                when 2
-                  %w{ 0 1 }
-                when 10
-                  ("0".."9").to_a + %w{ - }
-                when 16
-                  ("0".."9").to_a + ("a".."f").to_a
-                else
-                  []
-                end
-
-      unless string.split(//).all? { |s| symbols.include? s }
-        raise OutOfRangeSymbolError.new(port_name, radix, string)
+    def assert_in_range(allowed, string)
+      unless string.split(//).all? { |s| allowed.include? s }
+        raise OutOfRangeSymbolError.new(string, allowed)
       end
     end
 
