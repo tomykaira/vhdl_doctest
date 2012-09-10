@@ -38,6 +38,12 @@ FAILED: op = 44, rx_done = 0, stage = 1
       its(:count_failure) { should == 1 }
     end
 
+    context "test succeeded, output nothing" do
+      let(:output) { "" }
+
+      it { should be_succeeded }
+    end
+
     describe '#replace_binary' do
       def replace_binary(str)
         ResultFormatter.new('').replace_binary(str)
