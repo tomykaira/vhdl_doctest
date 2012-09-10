@@ -23,6 +23,29 @@ module VhdlDoctest
       vectors.map { |v| TestCase.new(Hash[defined_ports.zip(v)]) }
     end
 
+    # read given string as decimal
+    # Return: integer
+    def d(x)
+      x.to_i
+    end
+
+    # read given sring as hex
+    # Return: integer
+    def h(x)
+      x.to_i(16)
+    end
+    alias_method :x, :h
+
+    # read given sring as binary
+    # Return: integer
+    def b(x)
+      x.to_i(2)
+    end
+
+    def decode(function, value)
+      self.__send__(function || 'd', value)
+    end
+
     private
     def assert_in_range(port_name, radix, string)
       symbols = case radix
@@ -87,7 +110,6 @@ module VhdlDoctest
         port_name, attr = h.split(' ', 2)
         port_names << port_name
         prev = ''
-        radix = radix(attr)
         body.select! do |l|
           if l.empty?
             false
@@ -105,8 +127,7 @@ module VhdlDoctest
             if l[idx].strip.match(/^-+$/)
               l[idx] = :dont_care
             else
-              assert_in_range(port_name, radix, l[idx])
-              l[idx] = l[idx].to_i(radix)
+              l[idx] = decode(attr, l[idx])
             end
             prev = l[idx]
           end
