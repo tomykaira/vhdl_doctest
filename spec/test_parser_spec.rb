@@ -197,5 +197,13 @@ module VhdlDoctest
         specify { expect{ described_class.decode('d', 'hoge') }.to raise_error(OutOfRangeSymbolError) }
       end
     end
+
+    describe 'create lambda from def' do
+      it 'should define lambda with given name' do
+        name, proc = described_class.def_to_lambda("def f { |x| x }")
+        name.should == 'f'
+        proc.call(3).should == 3
+      end
+    end
   end
 end

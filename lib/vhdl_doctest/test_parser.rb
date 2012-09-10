@@ -36,7 +36,25 @@ module VhdlDoctest
     end
 
     def decode(function, value)
-      self.__send__(function || 'd', value)
+      if @functions && fun = @functions[function]
+        fun.call(value)
+      else
+        self.__send__(function || 'd', value)
+      end
+    end
+
+    # convert decoder definition string to lambda
+    # Example:
+    #     def f { |x| x.include?(".") ? [x.to_f].pack('f').unpack('I').first : x.to_i }
+    #     => #<Proc>
+    def def_to_lambda(def_string)
+      if def_string.match(/def\s+([[:alnum:]]*)\s+{([^}]*)}/)
+        [$1, eval("lambda { #{ $2 } }")]
+      end
+    end
+
+    def register_function(defs)
+      @functions = Hash[defs.map{ |d| def_to_lambda(d) }]
     end
 
     private
@@ -86,6 +104,7 @@ module VhdlDoctest
 
     def extract_values(vhdl)
       definition = test_definition(vhdl)
+      register_function(definition[:functions])
       table = replace_aliases(definition[:aliases], definition[:cases])
       header, *body = table.map { |l| extract_fields l }
       port_names = []
