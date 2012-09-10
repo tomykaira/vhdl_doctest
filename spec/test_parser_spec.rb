@@ -164,6 +164,21 @@ module VhdlDoctest
       specify { cases.last.should assert(zero: 0) }
     end
 
+    describe 'use a longer alias first' do
+      let(:input) { %q{
+-- TEST
+-- alias FOO 1
+-- alias FOOBAR 0
+-- a   | b   | control | zero
+-- 10  | -10 | 2       | FOO
+-- 10  | 10  | 2       | FOOBAR
+-- /TEST
+}}
+
+      specify { cases.first.should assert(zero: 1) }
+      specify { cases.last.should assert(zero: 0) }
+    end
+
     describe 'not enough fields' do
       let(:input) { %q{
 -- TEST

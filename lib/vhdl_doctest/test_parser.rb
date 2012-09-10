@@ -1,7 +1,7 @@
 module VhdlDoctest
   class OutOfRangeSymbolError < RuntimeError
-    def initialize(allowed, bad_value)
-      super("#{ bad_value } includes not allowed symbol(s)")
+    def initialize(bad_value, allowed)
+      super("#{ bad_value } includes not allowed symbol(s): #{ allowed }")
     end
   end
 
@@ -98,6 +98,7 @@ module VhdlDoctest
 
     def replace_aliases(aliases, case_table)
       pairs = aliases.map { |l| l.match(/alias\s+(.*)\s+(.*)$/)[1..2] }
+      pairs.sort_by! { |k,v| -k.length }  # use longer alias first
       case_table.each { |l| pairs.each { |p| l.gsub!(p[0], p[1]) } }
       case_table
     end
