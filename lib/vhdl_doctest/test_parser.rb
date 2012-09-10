@@ -66,17 +66,6 @@ module VhdlDoctest
       raise "Test definition not found"
     end
 
-    def radix(attr)
-      if attr
-        case attr[-1]
-        when 'b';      2
-        when 'h', 'x'; 16
-        end
-      else
-        10
-      end
-    end
-
     def replace_aliases(defs, table)
       pairs = defs.map { |l| l.match(/alias\s+(.*)\s+(.*)$/)[1..2] }
       table.each { |l| pairs.each { |p| l.gsub!(p[0], p[1]) } }
