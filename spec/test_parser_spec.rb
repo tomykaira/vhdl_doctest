@@ -25,7 +25,7 @@ module VhdlDoctest
         Port.new("output",  :out, Types::StdLogicVector.new(32)),
         Port.new("zero",    :out, Types::StdLogic.new)
       ]}
-    subject(:cases) { TestParser.parse(ports, input) }
+    subject(:cases) { TestParser.new(input).parse(ports) }
 
     describe 'header only' do
       let(:input) { %q{
@@ -206,16 +206,19 @@ module VhdlDoctest
     end
 
     describe '#decode' do
+      def decode(*args)
+        described_class.new(nil).decode(*args)
+      end
       describe 'd' do
-        specify { described_class.decode('d', '10').should == 10 }
-        specify { described_class.decode('d', '-10').should == -10 }
-        specify { expect{ described_class.decode('d', 'hoge') }.to raise_error(OutOfRangeSymbolError) }
+        specify { decode('d', '10').should == 10 }
+        specify { decode('d', '-10').should == -10 }
+        specify { expect{ decode('d', 'hoge') }.to raise_error(OutOfRangeSymbolError) }
       end
     end
 
     describe 'create lambda from def' do
       it 'should define lambda with given name' do
-        name, proc = described_class.def_to_lambda("def f { |x| x }")
+        name, proc = described_class.new(nil).def_to_lambda("def f { |x| x }")
         name.should == 'f'
         proc.call(3).should == 3
       end

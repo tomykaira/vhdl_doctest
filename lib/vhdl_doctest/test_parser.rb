@@ -5,10 +5,13 @@ module VhdlDoctest
     end
   end
 
-  module TestParser
-    extend self
-    def parse(ports, vhdl)
-      names, vectors = extract_values(vhdl)
+  class TestParser
+    def initialize(vhdl)
+      @vhdl = vhdl
+    end
+
+    def parse(ports)
+      names, vectors = extract_values(@vhdl)
       defined_ports = names.map { |name| ports.find { |p| p.name == name } }
       vectors.map { |v| TestCase.new(Hash[defined_ports.zip(v)]) }
     end
