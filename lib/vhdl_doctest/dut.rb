@@ -14,7 +14,25 @@ module VhdlDoctest
     end
 
     def ports
-      extract_ports
+      @ports ||=
+        remove_comments(port_block).split(";").
+        # "enable, push : in std_logic"
+        map { |line| line.strip.split(':') }.
+        # ["enable, push", "in std_logic"]
+        select { |names, attrs| ! attrs.nil? }.
+        map { |names, attrs| [names.split(','), *attrs.strip.split(' ', 2)]  }.
+        # [["enable", " push"], in, std_logic]"
+        map { |names, destination, type|
+        names.map { |name| Port.new(name.strip, destination.to_sym, VhdlDoctest::Types.parse(type)) }
+      }.flatten
+    end
+
+    def port_block
+      @vhdl.match(/entity\s*(?<entity_name>[a-zA-Z_0-9]*)\s*is\s+port\s*\((?<ports>.*?)\);\s*end\s+\k<entity_name>\s*;/m)[:ports]
+    end
+
+    def remove_comments(vhdl)
+      vhdl.gsub(/--.*$/, '')
     end
 
     def entity
@@ -31,22 +49,6 @@ module VhdlDoctest
         map { |line| line.split(":")[1].split(",") }.
         flatten.
         map { |file| file.strip }
-    end
-
-    # this assumes one-line one-port
-    def extract_ports
-      return @ports if @ports
-      @ports = []
-      definitions = @vhdl.match(/entity\s*(?<entity_name>[a-zA-Z_0-9]*)\s*is\s+port\s*\((?<ports>.*?)\);\s*end\s+\k<entity_name>\s*;/m)[:ports]
-      definitions.split("\n").each do |l|
-        names, attributes = l.strip.gsub(/;.*$/, '').split(":")
-        next unless attributes
-        destination, type = attributes.strip.split(' ', 2)
-        names.split(',').each do |name|
-          @ports << Port.new(name.strip, destination.to_sym, VhdlDoctest::Types.parse(type))
-        end
-      end
-      @ports
     end
   end
 end
