@@ -24,6 +24,16 @@ module VhdlDoctest
 
         its(:dependencies) { should == ['test.vhd', 'another.vhd'] }
       end
+
+      context 'multi definition lines' do
+        subject(:dut) { DUT.new(:not_used, :not_used, :not_used, vhdl) }
+        let(:vhdl) { %q{
+-- DOCTEST DEPENDENCIES: test.vhd
+-- DOCTEST DEPENDENCIES: another.vhd
+} }
+
+        its(:dependencies) { should == ['test.vhd', 'another.vhd'] }
+      end
     end
   end
 
