@@ -13,7 +13,7 @@ module VhdlDoctest
     its(:test_file) { should have(8).cases }
 
     describe 'dependencies' do
-      subject(:dut) { DUT.new(:not_used, :not_used, :not_used, vhdl) }
+      subject(:dut) { DUT.new(vhdl) }
 
       context 'actual file' do
         let(:vhdl) { File.read('examples/alu_depending.vhd') }
@@ -37,12 +37,9 @@ module VhdlDoctest
         its(:dependencies) { should == ['test.vhd', 'another.vhd'] }
       end
     end
-  end
 
-  describe DUT::DoctestParser do
     describe 'ports' do
-      let(:sample_vhdl) { 'examples/alu.vhd' }
-      subject { described_class.new(sample_vhdl).extract_ports }
+      subject(:ports) { DUT.parse(sample_vhdl).ports }
 
       it { should have(5).items }
       its('first.port_definition') { should == "a : in std_logic_vector(31 downto 0)" }
