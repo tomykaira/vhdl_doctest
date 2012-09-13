@@ -14,6 +14,6 @@ bin_file = Pathname.new(__FILE__).realpath
 $:.unshift File.expand_path("../../lib", bin_file)
 
 require "vhdl_doctest"
-test = VhdlDoctest::DUT.parse(ARGV[0]).test_file
+dut = VhdlDoctest::DUT.parse(ARGV[0])
 
-VhdlDoctest::TestRunner.new(STDOUT, ARGV[0], test).run
+VhdlDoctest::TestRunner.new(STDOUT, ARGV[0], dut.test_file, dut.dependencies).run
