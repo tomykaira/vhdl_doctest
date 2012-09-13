@@ -14,6 +14,10 @@ module VhdlDoctest
       TestFile.new(@entity, @ports, @cases)
     end
 
+    def dependencies
+      
+    end
+
     class DoctestParser
       def initialize(path)
         @vhdl = File.read(path)

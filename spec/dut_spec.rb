@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 module VhdlDoctest
-  sample_vhdl = 'examples/alu.vhd'
   describe DUT do
+    let(:sample_vhdl) { 'examples/alu.vhd' }
     subject { DUT.parse(sample_vhdl) }
 
     its(:entity) { should == "alu" }
@@ -11,10 +11,15 @@ module VhdlDoctest
 
     its('test_file.test_name') { should == 'testbench_alu' }
     its(:test_file) { should have(8).cases }
+
+    describe 'dependencies' do
+      
+    end
   end
 
   describe DUT::DoctestParser do
     describe 'ports' do
+      let(:sample_vhdl) { 'examples/alu.vhd' }
       subject { described_class.new(sample_vhdl).extract_ports }
 
       it { should have(5).items }
