@@ -13,7 +13,8 @@ module VhdlDoctest
     its(:test_file) { should have(8).cases }
 
     describe 'dependencies' do
-      
+      let(:sample_vhdl) { 'examples/alu_depending.vhd' }
+      its(:dependencies) { should == ['test.vhd'] }
     end
   end
 

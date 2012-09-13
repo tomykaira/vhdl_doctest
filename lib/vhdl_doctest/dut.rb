@@ -2,12 +2,12 @@ module VhdlDoctest
   class DUT
     def self.parse(path)
       entity, ports, cases = DoctestParser.new(path).parse
-      new(entity, ports, cases)
+      new(entity, ports, cases, File.read(path))
     end
 
     attr_accessor :entity, :ports, :cases
-    def initialize(entity, ports, cases)
-      @entity, @ports, @cases = entity, ports, cases
+    def initialize(entity, ports, cases, vhdl)
+      @entity, @ports, @cases, @vhdl = entity, ports, cases, vhdl
     end
 
     def test_file
@@ -15,7 +15,11 @@ module VhdlDoctest
     end
 
     def dependencies
-      
+      @vhdl.split("\n").
+        select { |line| line.include?('DOCTEST DEPENDENCIES') }.
+        map { |line| line.split(":")[1].split(",") }.
+        flatten.
+        map { |file| file.strip }
     end
 
     class DoctestParser
