@@ -13,11 +13,14 @@ module VhdlDoctest
     its(:test_file) { should have(8).cases }
 
     describe 'dependencies' do
-      let(:sample_vhdl) { 'examples/alu_depending.vhd' }
-      its(:dependencies) { should == ['test.vhd'] }
+      subject(:dut) { DUT.new(:not_used, :not_used, :not_used, vhdl) }
+
+      context 'actual file' do
+        let(:vhdl) { File.read('examples/alu_depending.vhd') }
+        its(:dependencies) { should == ['test.vhd'] }
+      end
 
       context 'multi files' do
-        subject(:dut) { DUT.new(:not_used, :not_used, :not_used, vhdl) }
         let(:vhdl) { %q{
 -- DOCTEST DEPENDENCIES: test.vhd, another.vhd
 } }
@@ -26,7 +29,6 @@ module VhdlDoctest
       end
 
       context 'multi definition lines' do
-        subject(:dut) { DUT.new(:not_used, :not_used, :not_used, vhdl) }
         let(:vhdl) { %q{
 -- DOCTEST DEPENDENCIES: test.vhd
 -- DOCTEST DEPENDENCIES: another.vhd
