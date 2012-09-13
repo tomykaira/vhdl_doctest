@@ -15,6 +15,15 @@ module VhdlDoctest
     describe 'dependencies' do
       let(:sample_vhdl) { 'examples/alu_depending.vhd' }
       its(:dependencies) { should == ['test.vhd'] }
+
+      context 'multi files' do
+        subject(:dut) { DUT.new(:not_used, :not_used, :not_used, vhdl) }
+        let(:vhdl) { %q{
+-- DOCTEST DEPENDENCIES: test.vhd, another.vhd
+} }
+
+        its(:dependencies) { should == ['test.vhd', 'another.vhd'] }
+      end
     end
   end
 
