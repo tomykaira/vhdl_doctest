@@ -68,7 +68,7 @@ module VhdlDoctest
     end
 
     def extract_fields(line)
-      p line.split("|", -1).map(&:strip)
+      line.split("|", -1).map(&:strip)
     end
 
     def test_block(vhdl)
