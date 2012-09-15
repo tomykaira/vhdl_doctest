@@ -205,6 +205,19 @@ module VhdlDoctest
       its(:last) { should set(a: 1092616192) }
     end
 
+    describe 'empty last column without space' do
+      let(:input) { %q{
+-- TEST
+-- a   | b | control | zero
+--  10 | 1 | 0       | 0
+--  10 | 0 | 0       |
+-- /TEST
+}}
+
+      it { should have(2).cases }
+      specify { cases.last.should assert(zero: 0) }
+    end
+
     describe '#decode' do
       def decode(*args)
         described_class.new(nil).decode(*args)
